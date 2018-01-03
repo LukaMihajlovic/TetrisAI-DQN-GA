@@ -34,7 +34,7 @@ class Tetris:
         highest_available = []
 
         highest_available_x = 0
-        if (action[1] == 1):
+        if action[1] == 1:
             highest_available_x = starting_coordinate + action[0]
         else:
             highest_available_x = starting_coordinate - action[0]
@@ -43,7 +43,7 @@ class Tetris:
         for i in range(highest_available_x-1, highest_available_x-1+width):
             for j in range(22):
                 if self.state[j][i] == 1:
-                    if (j < highest_available_y):
+                    if j <= highest_available_y:
                         highest_available_y = j-1
                     highest_available.append(j-1)
                     break
@@ -52,54 +52,53 @@ class Tetris:
                     highest_available.append(21)
 
         if label == "20":
-            if (highest_available[0] < highest_available[1] and highest_available[0] < highest_available[2]):
+            if highest_available[0] < highest_available[1] and highest_available[0] < highest_available[2]:
                 highest_available_y += 1
 
         elif label == "21":
-            if (highest_available[1] < highest_available[0]):
+            if highest_available[1] < highest_available[0]:
                 highest_available_y += 1
 
         elif label == "30":
-            if (highest_available[2] < highest_available[1] and highest_available[2] < highest_available[0]):
+            if highest_available[2] < highest_available[1] and highest_available[2] < highest_available[0]:
                 highest_available_y += 1
 
         elif label == "31":
-            if (highest_available[0] < highest_available[1]):
+            if highest_available[0] < highest_available[1]:
                 highest_available_y += 1
 
         elif label == "51":
-            if (highest_available[1] < highest_available[0]):
-                if ((highest_available[0] - highest_available[1]) == 2):
+            if highest_available[1] < highest_available[0]:
+                if (highest_available[0] - highest_available[1]) >= 2:
                     highest_available_y += 2
                 else:
                     highest_available_y += 1
 
         elif label == "52":
-            if (highest_available[0] < highest_available[1] and highest_available[0] < highest_available[2]):
+            if highest_available[0] < highest_available[1] and highest_available[0] < highest_available[2]:
                 highest_available_y += 1
 
         elif label == "62":
-            if (highest_available[2] < highest_available[1] and highest_available[2] < highest_available[0]):
+            if highest_available[2] < highest_available[1] and highest_available[2] < highest_available[0]:
                 highest_available_y += 1
 
         elif label == "63":
-            if (highest_available[0] < highest_available[1]):
-                if ((highest_available[1] - highest_available[0]) == 2):
+            if highest_available[0] < highest_available[1]:
+                if (highest_available[1] - highest_available[0]) >= 2:
                     highest_available_y += 2
                 else:
                     highest_available_y += 1
 
         elif label == "71":
-            if (highest_available[1] < highest_available[0]):
+            if highest_available[1] < highest_available[0]:
                 highest_available_y += 1
 
         elif label == "72":
-            if (highest_available[0] < highest_available[1] and highest_available[2] < highest_available[1]
-                and highest_available[0] == highest_available[2]):
+            if highest_available[0] < highest_available[1] and highest_available[2] < highest_available[1] and highest_available[0] == highest_available[2]:
                 highest_available_y += 1
 
         else:
-            if (highest_available[0] < highest_available[1]):
+            if highest_available[0] < highest_available[1]:
                 highest_available_y += 1
 
         # postavljanje figure
@@ -108,11 +107,14 @@ class Tetris:
                 if current_piece[i][j] == 1:
                     self.state[highest_available_y - (height - 1) + i][highest_available_x - 1 + j] = 1
 
-        for i in range(22):
-            print (self.state[i])
-
         #ciscenje
         highest_available = []
+
+        self.check_for_cleared_lines()
+
+        for i in range(22):
+            print (self.state[i])
+        print
 
 
 
@@ -134,6 +136,13 @@ class Tetris:
         else:
             return 4
 
+    def check_for_cleared_lines(self):
+
+        for i in range(22):
+            if all(x == 1 for x in self.state[i]):
+                self.state.pop(i)
+                self.state.insert(0, [0,0,0,0,0,0,0,0,0,0])
+                self.cleared_lines += 1
 
 
 if __name__ == '__main__':
@@ -143,16 +152,24 @@ if __name__ == '__main__':
     for e in Figure:
         dict[e.name] = e.value
 
-    tetris.generate_state_based_on_action_and_figure(dict, [2, 1, 0], 4)
-    tetris.generate_state_based_on_action_and_figure(dict, [2, 1, 0], 4)
-    tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 1], 2)
-    tetris.generate_state_based_on_action_and_figure(dict, [2, 1, 0], 2)
-    tetris.generate_state_based_on_action_and_figure(dict, [0, 1, 1], 5)
+    tetris.generate_state_based_on_action_and_figure(dict, [3, 0, 0], 5)
+    tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 6)
+    tetris.generate_state_based_on_action_and_figure(dict, [3, 1, 0], 4)
+    tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 3)
+    tetris.generate_state_based_on_action_and_figure(dict, [3 , 0, 0], 1)
+    tetris.generate_state_based_on_action_and_figure(dict,  [1, 0, 1], 2)
+    tetris.generate_state_based_on_action_and_figure(dict, [3, 1, 0], 4)
+    #tetris.generate_state_based_on_action_and_figure(dict, [1, 0, 0], 4)
+    #tetris.generate_state_based_on_action_and_figure(dict, [1, 0, 0], 4)
+    #tetris.generate_state_based_on_action_and_figure(dict, [1, 0, 0], 4)
+    #tetris.generate_state_based_on_action_and_figure(dict, [1, 0, 0], 4)
+    #tetris.generate_state_based_on_action_and_figure(dict, [1, 0, 0], 4)
 
-    #time.sleep(7)
 
-    #pyautogui.press("left", presses=2, interval=0.02)
-    #pyautogui.press("space", presses=1, interval=0.02)
+    time.sleep(7)
+
+    pyautogui.press("left", presses=3, interval=0.04)
+    pyautogui.press("space", presses=1, interval=0.02)
 
 
     time.sleep(1)
