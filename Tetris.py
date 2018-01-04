@@ -1,6 +1,7 @@
 from Figures import Figure
 import time
 import pyautogui
+import copy
 
 class Tetris:
 
@@ -102,19 +103,22 @@ class Tetris:
                 highest_available_y += 1
 
         # postavljanje figure
+        ret_val=copy.deepcopy(self.state)
         for i in range(len(current_piece) - 1, -1, -1):
             for j in range(len(current_piece[i]) - 1, -1, -1):
                 if current_piece[i][j] == 1:
-                    self.state[highest_available_y - (height - 1) + i][highest_available_x - 1 + j] = 1
+                    ret_val[highest_available_y - (height - 1) + i][highest_available_x - 1 + j] = 1
 
         #ciscenje
         highest_available = []
 
         self.check_for_cleared_lines()
 
-        for i in range(22):
+        '''for i in range(22):
             print (self.state[i])
-        print
+        print'''
+
+        return ret_val
 
 
 
@@ -144,6 +148,49 @@ class Tetris:
                 self.state.insert(0, [0,0,0,0,0,0,0,0,0,0])
                 self.cleared_lines += 1
 
+    def generate_states_for_action(self,dict,figure):
+
+
+        max_rotation=self.max_rotation_of_figure(figure)
+        action=[0,0,0]
+        ret_val=[]
+        for i in range(max_rotation):
+
+            label=str(figure)+str(i)
+            starting_coordinate = self.coordinate(label)
+            width = self.piece_width(label)
+            max_left = starting_coordinate - 1
+            current_piece_right_position = starting_coordinate + width - 1
+            max_right = 10 - current_piece_right_position
+
+            for j in range(max_left+1):
+                action = [j, 0, i]
+                ret_val.append(self.generate_state_based_on_action_and_figure(dict, action, figure))
+            for k in range(1,max_right+1):
+                action = [k, 1, i]
+                ret_val.append(self.generate_state_based_on_action_and_figure(dict, action, figure))
+
+
+
+        for u in range(len(ret_val)):
+            for o in range(22):
+                print (ret_val[u][o])
+            print
+
+        print
+        print len(ret_val)
+
+
+    def max_rotation_of_figure(self,num):
+        if num == 1:
+            return 1
+        elif num in [2,3,4]:
+            return 3
+        else:
+            return 4
+
+
+
 
 if __name__ == '__main__':
     tetris = Tetris()
@@ -152,13 +199,14 @@ if __name__ == '__main__':
     for e in Figure:
         dict[e.name] = e.value
 
-    tetris.generate_state_based_on_action_and_figure(dict, [3, 0, 0], 5)
-    tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 6)
-    tetris.generate_state_based_on_action_and_figure(dict, [3, 1, 0], 4)
-    tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 3)
-    tetris.generate_state_based_on_action_and_figure(dict, [3 , 0, 0], 1)
-    tetris.generate_state_based_on_action_and_figure(dict,  [1, 0, 1], 2)
-    tetris.generate_state_based_on_action_and_figure(dict, [3, 1, 0], 4)
+    #tetris.generate_state_based_on_action_and_figure(dict, [3, 0, 0], 5)
+    tetris.generate_states_for_action(dict,5)
+    #tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 6)
+    #tetris.generate_state_based_on_action_and_figure(dict, [3, 1, 0], 4)
+    #tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 3)
+    #tetris.generate_state_based_on_action_and_figure(dict,  [3 , 0, 0], 1)
+    #tetris.generate_state_based_on_action_and_figure(dict,  [1, 0, 1], 2)
+    #tetris.generate_state_based_on_action_and_figure(dict, [3, 1, 0], 4)
     #tetris.generate_state_based_on_action_and_figure(dict, [1, 0, 0], 4)
     #tetris.generate_state_based_on_action_and_figure(dict, [1, 0, 0], 4)
     #tetris.generate_state_based_on_action_and_figure(dict, [1, 0, 0], 4)
@@ -166,10 +214,10 @@ if __name__ == '__main__':
     #tetris.generate_state_based_on_action_and_figure(dict, [1, 0, 0], 4)
 
 
-    time.sleep(7)
+    #time.sleep(7)
 
-    pyautogui.press("left", presses=3, interval=0.04)
-    pyautogui.press("space", presses=1, interval=0.02)
+    #pyautogui.press("left", presses=3, interval=0.04)
+    #pyautogui.press("space", presses=1, interval=0.02)
 
 
-    time.sleep(1)
+    #time.sleep(1)
