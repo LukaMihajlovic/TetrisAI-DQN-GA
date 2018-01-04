@@ -98,6 +98,9 @@ class Tetris:
             if highest_available[0] < highest_available[1] and highest_available[2] < highest_available[1] and highest_available[0] == highest_available[2]:
                 highest_available_y += 1
 
+        elif label == "41":
+            pass
+
         else:
             if highest_available[0] < highest_available[1]:
                 highest_available_y += 1
@@ -185,7 +188,7 @@ class Tetris:
         if num == 1:
             return 1
         elif num in [2,3,4]:
-            return 3
+            return 2
         else:
             return 4
 
@@ -200,7 +203,7 @@ if __name__ == '__main__':
         dict[e.name] = e.value
 
     #tetris.generate_state_based_on_action_and_figure(dict, [3, 0, 0], 5)
-    tetris.generate_states_for_action(dict,5)
+    tetris.generate_states_for_action(dict,4)
     #tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 6)
     #tetris.generate_state_based_on_action_and_figure(dict, [3, 1, 0], 4)
     #tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 3)
