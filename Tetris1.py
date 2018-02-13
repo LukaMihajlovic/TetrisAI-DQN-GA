@@ -1,4 +1,4 @@
-from Figures import Figure
+from Figures1 import Figure
 from genetic import Genetic
 from state import State
 import time
@@ -12,8 +12,8 @@ import ctypes
 import cv2
 import mss
 import numpy
-from pynput.keyboard import Key, Controller
-
+from nekimodul import TetrisApp, cell_size, cols, maxfps
+import pygame
 
 class Tetris:
 
@@ -29,8 +29,6 @@ class Tetris:
         self.cleared_lines = 0
 
         self.game_over = False
-
-        self.keyboard = Controller()
 
     def generate_state_based_on_action_and_figure(self, dict, action, figure):
 
@@ -65,11 +63,7 @@ class Tetris:
                 if j == 19:
                     highest_available.append(19)
 
-<<<<<<< HEAD
-        if (all(x == highest_available[0] for x in highest_available)):
-=======
         if (all(x==highest_available[0] for x in highest_available)):
->>>>>>> 5dbf198330928caead984876a482fec283db2809
             if (highest_available[0] == 19):
                 highest_available_y = 19
 
@@ -128,11 +122,17 @@ class Tetris:
         for i in range(len(current_piece) - 1, -1, -1):
             for j in range(len(current_piece[i]) - 1, -1, -1):
                 if current_piece[i][j] == 1:
+                    print highest_available_y
+                    print height
+                    print i
+                    print (highest_available_y - (height - 1) + i)
+                    print (highest_available_x - 1 + j)
                     ret_val[highest_available_y - (height - 1) + i][highest_available_x - 1 + j] = 1
 
         #ciscenje
         highest_available = []
 
+        self.check_for_cleared_lines()
 
         '''for i in range(20):
             print (self.state[i])
@@ -143,12 +143,10 @@ class Tetris:
 
 
     def coordinate(self, label):
-        if label == "41":
-            return 6
-        elif label in ["10", "21", "31", "41", "51", "61", "71"]:
-            return 5
-        else:
+        if label in ["41", "40"]:
             return 4
+        else:
+            return 5
 
     def piece_width(self, label):
         if label == "41":
@@ -280,21 +278,58 @@ if __name__ == '__main__':
     for e in Figure:
         dict[e.name] = e.value
 
+    tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [0, 1, 0], 3)
 
-    '''tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 4)
+    tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [1, 1, 0], 1)
 
-    tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [2, 1, 0], 1)
-    tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [3, 1, 0], 1)'''
+    app = TetrisApp()
+    ###############################################################
+    ####################Deo bitan za tetris########################
+    app.gameover = False
+    app.paused = False
+
+    dont_burn_my_cpu = pygame.time.Clock()
+    while 1:
+        app.screen.fill((0, 0, 0))
+        if app.gameover:
+            app.center_msg("""Game Over!\nYour score: %dPress space to continue""" % app.score)
+        else:
+            if app.paused:
+                app.center_msg("Paused")
+            else:
+                pygame.draw.line(app.screen,
+                                 (255, 255, 255),
+                                 (app.rlim + 1, 0),
+                                 (app.rlim + 1, app.height - 1))
+                app.disp_msg("Next:", (
+                    app.rlim + cell_size,
+                    2))
+                app.disp_msg("Score: %d\n\nLevel: %d\nLines: %d" % (app.score, app.level, app.lines),
+                              (app.rlim + cell_size, cell_size * 5))
+                app.draw_matrix(app.bground_grid, (0, 0))
+                app.draw_matrix(app.board, (0, 0))
+                app.draw_matrix(app.stone,
+                                 (app.stone_x, app.stone_y))
+                app.draw_matrix(app.next_stone,
+                                 (cols + 1, 2))
+
+        pygame.display.update()
+
+        # ovo mora da stoji, ne sme se uklanjati
+        for event in pygame.event.get():
+            if event.type == pygame.USEREVENT + 1:
+                app.drop(False)
+
+        ######kod ide ovde
+        time.sleep(1)
+        app.move(+3)
+
+        dont_burn_my_cpu.tick(maxfps)
 
 
 
-
-
-
-
-
-    #for i in range(20):
-    #    print tetris.state[i]
+    for i in range(20):
+        print tetris.state[i]
     #tetris.generate_states_for_action(dict,4)
     #tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 6)
     #tetris.generate_state_based_on_action_and_figure(dict, [3, 1, 0], 4)
@@ -327,101 +362,81 @@ if __name__ == '__main__':
     driver.maximize_window()
     driver.set_page_load_timeout(30)
     driver.get("https://tetris.com/play-tetris/?utm_source=top_nav_link&utm_medium=webnav&utm_campaign=playNow_btm_tst&utm_content=text_play_now")
-    time.sleep(10)
+    time.sleep(20)
+    pyautogui.click(610, 380)
+    time.sleep(3)
+
+    # 800x600 windowed mode
     user32 = ctypes.windll.user32
     w = user32.GetSystemMetrics(0)
     h = user32.GetSystemMetrics(1)
-    mon = {'top': 165, 'left': 540, 'width': 270, 'height': 80}'''
+    time.sleep(3)
+    osmina = h / 8
+    h = h - osmina
+    mon = {'top': 165, 'left': 540, 'width': 270, 'height': 80}
+    # mon1 = {'top': 100, 'left': w/3 + w/11 , 'width': w/4, 'height': h}
 
+    title = '[MSS] FPS benchmark'
+    fps = 0
     sct = mss.mss()
-
-    # 800x600 windowed mode
-
+    last_time = time.time()
     num = 0;
-    #pyautogui.press("space", presses=1, interval=0.1)
+    pyautogui.press("space", presses=1, interval=0.1)'''
 
-    num=0
-    while num != 1127:
+    #num=0
+    #br=[4,1,2,7,3,6,7]
+    #while num != 5:
 
-        #if all(x == 0 for x in tetris.state[19]):
-        #    pyautogui.click(610, 380)
         #img = numpy.asarray(sct.grab(mon))
         #fps += 1
 
         # cv2.imshow(title, img)
-        #cv 2.imwrite("slik" + str(num) + ".png", img)
+        #cv2.imwrite("slik" + str(num) + ".png", img)
         # cv2.imwrite("skrining.png",img1)
         #avg_color_per_row = numpy.average(img, axis=0)
         #avg_color = numpy.average(avg_color_per_row, axis=0)
         #br = tetris.detect_figure(avg_color)
-        br=[2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6,2,4,5,3,6,7,2,1,3,4,6,2,4,5,6,2,6,4,3,2,7,6,5,4,1,4,7,6,5,4,6,3,2,1,7,6,5,4,2,3,1,7,7,4,1,2,6]
-        print len(br)
-        if br!=None:
+        #if br!=None:
 
-            state = tetris.generate_states_for_action(dict,br[num])
+        #state = tetris.generate_states_for_action(dict,br[num])
 
 
 
-            maks_heuristic = -10000
-            maks_idx=0
-            for i in range(len(state.states)):
+    '''maks_heuristic = -10000
+    maks_idx=0
+    for i in range(len(state.states)):
+        for n in range(22):
+            print (state.states[i][n])
 
-                genetic = Genetic(state.states[i])
+        genetic = Genetic(state.states[i])
+        print genetic.heuristic()
+        print maks_heuristic
+        print "++++++++++++++++++++++++++"
+        heuristic = genetic.heuristic()
+        if heuristic>maks_heuristic:
+            maks_heuristic = heuristic
+            maks_idx = i
 
-                heuristic = genetic.heuristic()
-                if heuristic>maks_heuristic:
-                    maks_heuristic = heuristic
-                    maks_idx = i
+    tetris.state = state.states[maks_idx]
+    for m in range(22):
+            print (tetris.state[m])'''
+    #print "***************************************"
+    '''pyautogui.press("up", presses=state.actions[i][2], interval=0.05)
+    if (state.actions[i][1] == 0):
+        pyautogui.press("left", presses=state.actions[i][0], interval=0.05)
 
-            tetris.state = state.states[maks_idx]
-            #for j in tetris.state:
-            #   print j
-            #print "+++++++++++"
-            tetris.check_for_cleared_lines()
+    if (state.actions[i][1] == 1):
+        pyautogui.press("right", presses=state.actions[i][0], interval=0.05)
 
+    pyautogui.press("space", presses=1, interval=0.1)'''
+    '''if num > 7 and num < 16:
+        pyautogui.press("right", presses=5, interval=0.05)
 
-            '''pyautogui.press("up", presses=state.actions[maks_idx][2], interval=0.15)
-
-            for u in range(state.actions[maks_idx][2]):
-                tetris.keyboard.press(Key.up)
-                tetris.keyboard.release(Key.up)
-                time.sleep(0.15)
-                #pyautogui.press("up")
-
-            if (state.actions[maks_idx][1] == 0):
-                pyautogui.press("left", presses=state.actions[maks_idx][0], interval=0.15)
-                for l in range(state.actions[maks_idx][0]):
-                    tetris.keyboard.press(Key.left)
-                    tetris.keyboard.release(Key.left)
-                    time.sleep(0.15)
-
-                    pyautogui.press("left")'''
-
-
-            '''if (state.actions[maks_idx][1] == 1):
-                pyautogui.press("right", presses=state.actions[maks_idx][0], interval=0.15)
-                for r in range(state.actions[maks_idx][0]):
-                    tetris.keyboard.press(Key.right)
-                    tetris.keyboard.release(Key.right)
-                    time.sleep(0.15)
-                    #pyautogui.press("right")
-
-            tetris.keyboard.press(Key.space)
-            tetris.keyboard.release(Key.space)
-            time.sleep(0.12)'''
-
-            #pyautogui.press("space")
-
-            '''if num > 7 and num < 16:
-                pyautogui.press("right", presses=5, interval=0.05)
-        
-            if num > 15:
-                pyautogui.press("left", presses=5, interval=0.05)
-            pyautogui.press("space", presses=1, interval=0.1)'''
-            if cv2.waitKey(25) & 0xFF == ord('q'):
-                cv2.destroyAllWindows()
-                break
-            num = num + 1
-            print num
-    for i in range(20):
-        print 
+    if num > 15:
+        pyautogui.press("left", presses=5, interval=0.05)
+    pyautogui.press("space", presses=1, interval=0.1)'''
+    '''if cv2.waitKey(25) & 0xFF == ord('q'):
+        cv2.destroyAllWindows()
+        break
+    num = num + 1
+    print num'''
