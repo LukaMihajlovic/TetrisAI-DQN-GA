@@ -19,7 +19,7 @@ class Tetris:
 
         #reprezentacija stanja
         self.state = []
-        for i in range(22):
+        for i in range(20):
             self.state.append([])
             for j in range(10):
                 self.state[i].append(0)
@@ -41,7 +41,7 @@ class Tetris:
         width = self.piece_width(label)
         height = len(current_piece)
 
-        highest_available_y = 22
+        highest_available_y = 20
         highest_available = []
 
         highest_available_x = 0
@@ -52,15 +52,15 @@ class Tetris:
 
         #pronalazenje najvise slobodne tacke na sirini figure
         for i in range(highest_available_x-1, highest_available_x-1+width):
-            for j in range(22):
+            for j in range(20):
                 if self.state[j][i] == 1:
                     if j <= highest_available_y:
                         highest_available_y = j-1
                     highest_available.append(j-1)
                     break
-                if j == 21:
-                    highest_available_y = 21
-                    highest_available.append(21)
+                if j == 19:
+                    highest_available_y = 19
+                    highest_available.append(19)
 
         if label == "20":
             if highest_available[0] < highest_available[1] and highest_available[0] < highest_available[2]:
@@ -108,10 +108,7 @@ class Tetris:
             if highest_available[0] < highest_available[1] and highest_available[2] < highest_available[1] and highest_available[0] == highest_available[2]:
                 highest_available_y += 1
 
-        elif label == "41":
-            pass
-
-        else:
+        elif label == "73":
             if highest_available[0] < highest_available[1]:
                 highest_available_y += 1
 
@@ -132,7 +129,7 @@ class Tetris:
 
         self.check_for_cleared_lines()
 
-        '''for i in range(22):
+        '''for i in range(20):
             print (self.state[i])
         print'''
 
@@ -160,7 +157,7 @@ class Tetris:
 
     def check_for_cleared_lines(self):
 
-        for i in range(22):
+        for i in range(20):
             if all(x == 1 for x in self.state[i]):
                 self.state.pop(i)
                 self.state.insert(0, [0,0,0,0,0,0,0,0,0,0])
@@ -194,6 +191,8 @@ class Tetris:
 
         '''for u in range(len(ret_val)):
             for o in range(22):
+        for u in range(len(ret_val)):
+            for o in range(20):
                 print (ret_val[u][o])
             print'''
 
@@ -278,11 +277,10 @@ if __name__ == '__main__':
 
     tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 4)
 
-    tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 7)
+    tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 1)
 
-    tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 7)
 
-    for i in range(22):
+    for i in range(20):
         print tetris.state[i]
     #tetris.generate_states_for_action(dict,4)
     #tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 6)
