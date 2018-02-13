@@ -276,9 +276,12 @@ if __name__ == '__main__':
     for e in Figure:
         dict[e.name] = e.value
 
-    tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [3, 0, 0], 4)
+    tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 4)
 
-    tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [1, 0, 0], 1)
+    tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 7)
+
+    tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 7)
+
     for i in range(22):
         print tetris.state[i]
     #tetris.generate_states_for_action(dict,4)
