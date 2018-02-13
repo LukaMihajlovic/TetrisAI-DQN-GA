@@ -1,7 +1,17 @@
 from Figures import Figure
+from genetic import Genetic
+from state import State
 import time
 import pyautogui
 import copy
+from selenium import webdriver
+import os
+from selenium.webdriver.chrome.options import Options
+import pyautogui
+import ctypes
+import cv2
+import mss
+import numpy
 
 class Tetris:
 
@@ -110,6 +120,11 @@ class Tetris:
         for i in range(len(current_piece) - 1, -1, -1):
             for j in range(len(current_piece[i]) - 1, -1, -1):
                 if current_piece[i][j] == 1:
+                    print highest_available_y
+                    print height
+                    print i
+                    print (highest_available_y - (height - 1) + i)
+                    print (highest_available_x - 1 + j)
                     ret_val[highest_available_y - (height - 1) + i][highest_available_x - 1 + j] = 1
 
         #ciscenje
@@ -156,7 +171,7 @@ class Tetris:
 
         max_rotation=self.max_rotation_of_figure(figure)
         action=[0,0,0]
-        ret_val=[]
+        ret_val=State()
         for i in range(max_rotation):
 
             label=str(figure)+str(i)
@@ -168,20 +183,23 @@ class Tetris:
 
             for j in range(max_left+1):
                 action = [j, 0, i]
-                ret_val.append(self.generate_state_based_on_action_and_figure(dict, action, figure))
+                ret_val.states.append(self.generate_state_based_on_action_and_figure(dict, action, figure))
+                ret_val.actions.append(action)
             for k in range(1,max_right+1):
                 action = [k, 1, i]
-                ret_val.append(self.generate_state_based_on_action_and_figure(dict, action, figure))
+                ret_val.states.append(self.generate_state_based_on_action_and_figure(dict, action, figure))
+                ret_val.actions.append(action)
 
 
 
-        for u in range(len(ret_val)):
+        '''for u in range(len(ret_val)):
             for o in range(22):
                 print (ret_val[u][o])
-            print
+            print'''
 
-        print
-        print len(ret_val)
+        #print
+        #print len(ret_val)
+        return ret_val
 
 
     def max_rotation_of_figure(self,num):
@@ -192,7 +210,63 @@ class Tetris:
         else:
             return 4
 
+    def screen_record_efficient(self):
+        # 800x600 windowed mode
+        user32 = ctypes.windll.user32
+        w = user32.GetSystemMetrics(0)
+        h = user32.GetSystemMetrics(1)
+        time.sleep(15)
+        osmina = h / 8
+        h = h - osmina
+        mon = {'top': 165, 'left': 540, 'width': 270, 'height': 80}
+        # mon1 = {'top': 100, 'left': w/3 + w/11 , 'width': w/4, 'height': h}
 
+        title = '[MSS] FPS benchmark'
+        fps = 0
+        sct = mss.mss()
+        last_time = time.time()
+        num = 0;
+
+        while num != 30:
+
+            img = numpy.asarray(sct.grab(mon))
+            # img1 = numpy.asarray(sct.grab(mon1))
+            fps += 1
+
+            # cv2.imshow(title, img)
+            # cv2.imwrite("slik" + str(num) + ".png", img)
+            # cv2.imwrite("skrining.png",img1)
+            avg_color_per_row = numpy.average(img, axis=0)
+            avg_color = numpy.average(avg_color_per_row, axis=0)
+            br = detect_figure(avg_color)
+            self.generate_states_for_action()
+
+            '''if num > 7 and num < 16:
+                pyautogui.press("right", presses=5, interval=0.05)
+
+            if num > 15:
+                pyautogui.press("left", presses=5, interval=0.05)
+            pyautogui.press("space", presses=1, interval=0.1)'''
+            if cv2.waitKey(25) & 0xFF == ord('q'):
+                cv2.destroyAllWindows()
+                break
+            num = num + 1
+        return fps
+
+    def detect_figure(self,avg):
+        granice = [[7, 21, 23], [7, 7, 23], [12, 23, 7], [23, 21, 7], [23, 16, 7], [7, 18, 23], [23, 7, 20]]
+        num = 0
+        for i in granice:
+            prosek1 = avg[0]
+            prosek2 = avg[1]
+            prosek3 = avg[2]
+            prva = i[0]
+            druga = i[1]
+            treca = i[2]
+            if (prosek1 > prva) and (prosek1 < prva + 1) and (prosek2 > druga) and (prosek2 < druga + 1) and (
+                prosek3 > treca) and (prosek3 < treca + 1):
+                return num + 1
+            num = num + 1
 
 
 if __name__ == '__main__':
@@ -202,8 +276,12 @@ if __name__ == '__main__':
     for e in Figure:
         dict[e.name] = e.value
 
-    #tetris.generate_state_based_on_action_and_figure(dict, [3, 0, 0], 5)
-    tetris.generate_states_for_action(dict,4)
+    tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [3, 0, 0], 4)
+
+    tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [1, 0, 0], 1)
+    for i in range(22):
+        print tetris.state[i]
+    #tetris.generate_states_for_action(dict,4)
     #tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 6)
     #tetris.generate_state_based_on_action_and_figure(dict, [3, 1, 0], 4)
     #tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 3)
@@ -218,9 +296,98 @@ if __name__ == '__main__':
 
 
     #time.sleep(7)
-
+    #aaaHello world!
     #pyautogui.press("left", presses=3, interval=0.04)
-    #pyautogui.press("space", presses=1, interval=0.02)
+    #pyautogui.press('right', presses=3, interval=0.04)
+    #pyautogui.typewrite('Hello world!', interval=0.25)
 
 
     #time.sleep(1)
+    '''executable_path = "chromedriver.exe"
+    os.environ["webdriver.chrome.driver"] = executable_path
+    chop = Options()
+    chop.add_extension("Adblock-Plus_v1.12.4.crx")
+    chop.add_argument("start-maximized")
+    chop.add_argument("hide-scrollbars")
+    driver = webdriver.Chrome(executable_path=executable_path, chrome_options=chop)
+    driver.maximize_window()
+    driver.set_page_load_timeout(30)
+    driver.get("https://tetris.com/play-tetris/?utm_source=top_nav_link&utm_medium=webnav&utm_campaign=playNow_btm_tst&utm_content=text_play_now")
+    time.sleep(20)
+    pyautogui.click(610, 380)
+    time.sleep(3)
+
+    # 800x600 windowed mode
+    user32 = ctypes.windll.user32
+    w = user32.GetSystemMetrics(0)
+    h = user32.GetSystemMetrics(1)
+    time.sleep(3)
+    osmina = h / 8
+    h = h - osmina
+    mon = {'top': 165, 'left': 540, 'width': 270, 'height': 80}
+    # mon1 = {'top': 100, 'left': w/3 + w/11 , 'width': w/4, 'height': h}
+
+    title = '[MSS] FPS benchmark'
+    fps = 0
+    sct = mss.mss()
+    last_time = time.time()
+    num = 0;
+    pyautogui.press("space", presses=1, interval=0.1)'''
+
+    #num=0
+    #br=[4,1,2,7,3,6,7]
+    #while num != 5:
+
+        #img = numpy.asarray(sct.grab(mon))
+        #fps += 1
+
+        # cv2.imshow(title, img)
+        #cv2.imwrite("slik" + str(num) + ".png", img)
+        # cv2.imwrite("skrining.png",img1)
+        #avg_color_per_row = numpy.average(img, axis=0)
+        #avg_color = numpy.average(avg_color_per_row, axis=0)
+        #br = tetris.detect_figure(avg_color)
+        #if br!=None:
+
+        #state = tetris.generate_states_for_action(dict,br[num])
+
+
+
+    '''maks_heuristic = -10000
+    maks_idx=0
+    for i in range(len(state.states)):
+        for n in range(22):
+            print (state.states[i][n])
+
+        genetic = Genetic(state.states[i])
+        print genetic.heuristic()
+        print maks_heuristic
+        print "++++++++++++++++++++++++++"
+        heuristic = genetic.heuristic()
+        if heuristic>maks_heuristic:
+            maks_heuristic = heuristic
+            maks_idx = i
+
+    tetris.state = state.states[maks_idx]
+    for m in range(22):
+            print (tetris.state[m])'''
+    #print "***************************************"
+    '''pyautogui.press("up", presses=state.actions[i][2], interval=0.05)
+    if (state.actions[i][1] == 0):
+        pyautogui.press("left", presses=state.actions[i][0], interval=0.05)
+
+    if (state.actions[i][1] == 1):
+        pyautogui.press("right", presses=state.actions[i][0], interval=0.05)
+
+    pyautogui.press("space", presses=1, interval=0.1)'''
+    '''if num > 7 and num < 16:
+        pyautogui.press("right", presses=5, interval=0.05)
+
+    if num > 15:
+        pyautogui.press("left", presses=5, interval=0.05)
+    pyautogui.press("space", presses=1, interval=0.1)'''
+    '''if cv2.waitKey(25) & 0xFF == ord('q'):
+        cv2.destroyAllWindows()
+        break
+    num = num + 1
+    print num'''
