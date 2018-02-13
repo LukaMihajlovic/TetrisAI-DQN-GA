@@ -48,7 +48,7 @@ class Genetic:
         for i in range(10):
             for j in range(self.height, len(self.state)):
                 if self.state[j][i] == 1:
-                    kolone[i] = 22 - j
+                    kolone[i] = 20 - j
                     break
         return kolone
 
@@ -75,7 +75,7 @@ class Genetic:
 
     def complete_lines(self):
         ret_val=0
-        for i in range(self.height,22):
+        for i in range(self.height,20):
             if all(x == 1 for x in self.state[i]):
                 ret_val+=1
 
