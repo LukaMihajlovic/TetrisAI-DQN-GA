@@ -1,4 +1,4 @@
-from Figures import Figure
+from Figures1 import Figure
 from genetic import Genetic
 from state import State
 import time
@@ -12,6 +12,8 @@ import ctypes
 import cv2
 import mss
 import numpy
+from nekimodul import TetrisApp, cell_size, cols, maxfps
+import pygame
 
 class Tetris:
 
@@ -141,12 +143,10 @@ class Tetris:
 
 
     def coordinate(self, label):
-        if label == "41":
-            return 6
-        elif label in ["10", "21", "31", "41", "51", "61", "71"]:
-            return 5
-        else:
+        if label in ["41", "40"]:
             return 4
+        else:
+            return 5
 
     def piece_width(self, label):
         if label == "41":
@@ -278,10 +278,53 @@ if __name__ == '__main__':
     for e in Figure:
         dict[e.name] = e.value
 
-
     tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [0, 1, 0], 3)
 
     tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [1, 1, 0], 1)
+
+    app = TetrisApp()
+    ###############################################################
+    ####################Deo bitan za tetris########################
+    app.gameover = False
+    app.paused = False
+
+    dont_burn_my_cpu = pygame.time.Clock()
+    while 1:
+        app.screen.fill((0, 0, 0))
+        if app.gameover:
+            app.center_msg("""Game Over!\nYour score: %dPress space to continue""" % app.score)
+        else:
+            if app.paused:
+                app.center_msg("Paused")
+            else:
+                pygame.draw.line(app.screen,
+                                 (255, 255, 255),
+                                 (app.rlim + 1, 0),
+                                 (app.rlim + 1, app.height - 1))
+                app.disp_msg("Next:", (
+                    app.rlim + cell_size,
+                    2))
+                app.disp_msg("Score: %d\n\nLevel: %d\nLines: %d" % (app.score, app.level, app.lines),
+                              (app.rlim + cell_size, cell_size * 5))
+                app.draw_matrix(app.bground_grid, (0, 0))
+                app.draw_matrix(app.board, (0, 0))
+                app.draw_matrix(app.stone,
+                                 (app.stone_x, app.stone_y))
+                app.draw_matrix(app.next_stone,
+                                 (cols + 1, 2))
+
+        pygame.display.update()
+
+        # ovo mora da stoji, ne sme se uklanjati
+        for event in pygame.event.get():
+            if event.type == pygame.USEREVENT + 1:
+                app.drop(False)
+
+        ######kod ide ovde
+        time.sleep(1)
+        app.move(+3)
+
+        dont_burn_my_cpu.tick(maxfps)
 
 
 
