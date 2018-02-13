@@ -65,11 +65,8 @@ class Tetris:
                 if j == 19:
                     highest_available.append(19)
 
-<<<<<<< HEAD
-        if (all(x == highest_available[0] for x in highest_available)):
-=======
+
         if (all(x==highest_available[0] for x in highest_available)):
->>>>>>> 5dbf198330928caead984876a482fec283db2809
             if (highest_available[0] == 19):
                 highest_available_y = 19
 
