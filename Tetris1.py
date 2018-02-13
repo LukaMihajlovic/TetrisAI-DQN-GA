@@ -83,7 +83,7 @@ class Tetris:
             if highest_available[0] < highest_available[1]:
                 highest_available_y += 1
 
-        elif label == "51":
+        elif label == "53":
             if highest_available[1] < highest_available[0]:
                 if (highest_available[0] - highest_available[1]) >= 2:
                     highest_available_y += 2
@@ -98,14 +98,14 @@ class Tetris:
             if highest_available[2] < highest_available[1] and highest_available[2] < highest_available[0]:
                 highest_available_y += 1
 
-        elif label == "63":
+        elif label == "61":
             if highest_available[0] < highest_available[1]:
                 if (highest_available[1] - highest_available[0]) >= 2:
                     highest_available_y += 2
                 else:
                     highest_available_y += 1
 
-        elif label == "71":
+        elif label == "73":
             if highest_available[1] < highest_available[0]:
                 highest_available_y += 1
 
@@ -113,7 +113,7 @@ class Tetris:
             if highest_available[0] < highest_available[1] and highest_available[2] < highest_available[1] and highest_available[0] == highest_available[2]:
                 highest_available_y += 1
 
-        elif label == "73":
+        elif label == "71":
             if highest_available[0] < highest_available[1]:
                 highest_available_y += 1
 
@@ -122,11 +122,6 @@ class Tetris:
         for i in range(len(current_piece) - 1, -1, -1):
             for j in range(len(current_piece[i]) - 1, -1, -1):
                 if current_piece[i][j] == 1:
-                    print highest_available_y
-                    print height
-                    print i
-                    print (highest_available_y - (height - 1) + i)
-                    print (highest_available_x - 1 + j)
                     ret_val[highest_available_y - (height - 1) + i][highest_available_x - 1 + j] = 1
 
         #ciscenje
@@ -256,12 +251,12 @@ class Tetris:
         return fps
 
     def detect_figure(self,avg):
-        granice = [[7, 21, 23], [7, 7, 23], [12, 23, 7], [23, 21, 7], [23, 16, 7], [7, 18, 23], [23, 7, 20]]
+        granice = [[56.5, 45.5, 43.5], [62.5, 34.5, 37.5], [36.5, 53.5, 33.5], [27.5, 53.5, 42.5], [23.5, 41.5, 64.5], [23.5, 37.5, 23.5], [31.75, 31.75, 65.75]]
         num = 0
         for i in granice:
-            prosek1 = avg[0]
+            prosek1 = avg[2]
             prosek2 = avg[1]
-            prosek3 = avg[2]
+            prosek3 = avg[0]
             prva = i[0]
             druga = i[1]
             treca = i[2]
@@ -278,20 +273,36 @@ if __name__ == '__main__':
     for e in Figure:
         dict[e.name] = e.value
 
-    tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [0, 1, 0], 3)
+    #tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [0, 1, 0], 3)
 
-    tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [1, 1, 0], 1)
+    #tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [1, 1, 0], 1)
 
     app = TetrisApp()
     ###############################################################
     ####################Deo bitan za tetris########################
+    key_actions = {
+        'ESCAPE': app.quit,
+        'LEFT': lambda: app.move(-1),
+        'RIGHT': lambda: app.move(+1),
+        'DOWN': lambda: app.drop(True),
+        'UP': app.rotate_stone,
+        'p': app.toggle_pause,
+        'SPACE': app.start_game,
+        'RETURN': app.insta_drop
+    }
+
     app.gameover = False
     app.paused = False
 
     dont_burn_my_cpu = pygame.time.Clock()
+    num=0;
+    mon = {'top': 0, 'left': 0, 'width': 200, 'height': 200}
+    sct = mss.mss()
     while 1:
+
         app.screen.fill((0, 0, 0))
         if app.gameover:
+            #time.sleep(200)
             app.center_msg("""Game Over!\nYour score: %dPress space to continue""" % app.score)
         else:
             if app.paused:
@@ -305,13 +316,13 @@ if __name__ == '__main__':
                     app.rlim + cell_size,
                     2))
                 app.disp_msg("Score: %d\n\nLevel: %d\nLines: %d" % (app.score, app.level, app.lines),
-                              (app.rlim + cell_size, cell_size * 5))
+                             (app.rlim + cell_size, cell_size * 5))
                 app.draw_matrix(app.bground_grid, (0, 0))
                 app.draw_matrix(app.board, (0, 0))
                 app.draw_matrix(app.stone,
-                                 (app.stone_x, app.stone_y))
+                                (app.stone_x, app.stone_y))
                 app.draw_matrix(app.next_stone,
-                                 (cols + 1, 2))
+                                (cols + 1, 2))
 
         pygame.display.update()
 
@@ -319,17 +330,72 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.USEREVENT + 1:
                 app.drop(False)
+            elif event.type == pygame.QUIT:
+                app.quit()
+            elif event.type == pygame.KEYDOWN:
+                for key in key_actions:
+                    if event.key == eval("pygame.K_"
+                                                 + key):
+                        key_actions[key]()
 
         ######kod ide ovde
-        time.sleep(1)
-        app.move(+3)
+        rect = pygame.Rect(0, 0, 280, 56)
+        sub = app.screen.subsurface(rect)
+        #pygame.image.save(sub, "slik" + str(num) + ".png")
+        colors = pygame.transform.average_color(sub)
+        br = tetris.detect_figure(colors)
 
+
+        if br==None:
+            app.gameover=True
+
+        if br!=None:
+
+            state = tetris.generate_states_for_action(dict,br)
+
+            maks_heuristic = -10000
+            maks_idx=0
+            for i in range(len(state.states)):
+
+                genetic = Genetic(state.states[i])
+
+                heuristic = genetic.heuristic()
+                if heuristic>maks_heuristic:
+                    maks_heuristic = heuristic
+                    maks_idx = i
+
+            tetris.state = state.states[maks_idx]
+            for j in tetris.state:
+               print j
+            print "+++++++++++"
+            tetris.check_for_cleared_lines()
+
+            for r in range(state.actions[maks_idx][2]):
+                app.rotate_stone()
+
+            if (state.actions[maks_idx][1] == 0):
+                move = -1 * state.actions[maks_idx][0]
+                app.move(move)
+
+            if (state.actions[maks_idx][1] == 1):
+                move = state.actions[maks_idx][0]
+                app.move(move)
+
+            app.insta_drop()
+            time.sleep(0.5)
+
+        num += 1
         dont_burn_my_cpu.tick(maxfps)
 
 
 
-    for i in range(20):
-        print tetris.state[i]
+
+        #cv2.imwrite()
+
+
+
+
+
     #tetris.generate_states_for_action(dict,4)
     #tetris.generate_state_based_on_action_and_figure(dict, [0, 0, 0], 6)
     #tetris.generate_state_based_on_action_and_figure(dict, [3, 1, 0], 4)
@@ -351,41 +417,11 @@ if __name__ == '__main__':
     #pyautogui.typewrite('Hello world!', interval=0.25)
 
 
-    #time.sleep(1)
-    '''executable_path = "chromedriver.exe"
-    os.environ["webdriver.chrome.driver"] = executable_path
-    chop = Options()
-    chop.add_extension("Adblock-Plus_v1.12.4.crx")
-    chop.add_argument("start-maximized")
-    chop.add_argument("hide-scrollbars")
-    driver = webdriver.Chrome(executable_path=executable_path, chrome_options=chop)
-    driver.maximize_window()
-    driver.set_page_load_timeout(30)
-    driver.get("https://tetris.com/play-tetris/?utm_source=top_nav_link&utm_medium=webnav&utm_campaign=playNow_btm_tst&utm_content=text_play_now")
-    time.sleep(20)
-    pyautogui.click(610, 380)
-    time.sleep(3)
 
-    # 800x600 windowed mode
-    user32 = ctypes.windll.user32
-    w = user32.GetSystemMetrics(0)
-    h = user32.GetSystemMetrics(1)
-    time.sleep(3)
-    osmina = h / 8
-    h = h - osmina
-    mon = {'top': 165, 'left': 540, 'width': 270, 'height': 80}
-    # mon1 = {'top': 100, 'left': w/3 + w/11 , 'width': w/4, 'height': h}
 
-    title = '[MSS] FPS benchmark'
-    fps = 0
-    sct = mss.mss()
-    last_time = time.time()
-    num = 0;
-    pyautogui.press("space", presses=1, interval=0.1)'''
 
-    #num=0
-    #br=[4,1,2,7,3,6,7]
-    #while num != 5:
+
+
 
         #img = numpy.asarray(sct.grab(mon))
         #fps += 1

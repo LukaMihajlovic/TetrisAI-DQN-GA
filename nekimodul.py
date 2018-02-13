@@ -43,7 +43,7 @@ from random import randrange as rand
 import pygame, sys
 
 # The configuration
-cell_size = 36
+cell_size = 28
 cols = 10
 rows = 22
 maxfps = 20
