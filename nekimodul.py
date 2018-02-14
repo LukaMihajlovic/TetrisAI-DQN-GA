@@ -41,6 +41,7 @@
 
 from random import randrange as rand
 import pygame, sys
+import random, collections
 
 # The configuration
 cell_size = 28
@@ -139,12 +140,26 @@ class TetrisApp(object):
         # mouse movement
         # events, so we
         # block them.
-        self.next_stone = tetris_shapes[rand(len(tetris_shapes))]
+        self.bag=[0,1,2,3,4,5,6]
+        random.shuffle(self.bag)
+        self.sequence = collections.deque(self.bag)
+        self.next_stone = tetris_shapes[self.stone_next()]
         self.init_game()
 
+
+    def stone_next(self):
+        num = self.sequence.popleft()
+        if not self.sequence:
+            bag = [0, 1, 2, 3, 4, 5, 6]
+            random.shuffle(bag)
+            self.sequence.extend(bag)
+        return num
+
     def new_stone(self):
+
+
         self.stone = self.next_stone[:]
-        self.next_stone = tetris_shapes[rand(len(tetris_shapes))]
+        self.next_stone = tetris_shapes[self.stone_next()]
         self.stone_x = int(cols / 2 - len(self.stone[0]) / 2)
         self.stone_y = 0
 

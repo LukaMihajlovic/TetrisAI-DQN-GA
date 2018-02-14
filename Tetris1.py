@@ -194,8 +194,6 @@ class Tetris:
                 print (ret_val[u][o])
             print'''
 
-        #print
-        #print len(ret_val)
         return ret_val
 
 
@@ -207,48 +205,7 @@ class Tetris:
         else:
             return 4
 
-    def screen_record_efficient(self):
-        # 800x600 windowed mode
-        user32 = ctypes.windll.user32
-        w = user32.GetSystemMetrics(0)
-        h = user32.GetSystemMetrics(1)
-        time.sleep(15)
-        osmina = h / 8
-        h = h - osmina
-        mon = {'top': 165, 'left': 540, 'width': 270, 'height': 80}
-        # mon1 = {'top': 100, 'left': w/3 + w/11 , 'width': w/4, 'height': h}
 
-        title = '[MSS] FPS benchmark'
-        fps = 0
-        sct = mss.mss()
-        last_time = time.time()
-        num = 0;
-
-        while num != 30:
-
-            img = numpy.asarray(sct.grab(mon))
-            # img1 = numpy.asarray(sct.grab(mon1))
-            fps += 1
-
-            # cv2.imshow(title, img)
-            # cv2.imwrite("slik" + str(num) + ".png", img)
-            # cv2.imwrite("skrining.png",img1)
-            avg_color_per_row = numpy.average(img, axis=0)
-            avg_color = numpy.average(avg_color_per_row, axis=0)
-            br = self.detect_figure(avg_color)
-            self.generate_states_for_action()
-
-            '''if num > 7 and num < 16:
-                pyautogui.press("right", presses=5, interval=0.05)
-
-            if num > 15:
-                pyautogui.press("left", presses=5, interval=0.05)
-            pyautogui.press("space", presses=1, interval=0.1)'''
-            if cv2.waitKey(25) & 0xFF == ord('q'):
-                cv2.destroyAllWindows()
-                break
-            num = num + 1
-        return fps
 
     def detect_figure(self,avg):
         granice = [[56.5, 45.5, 43.5], [62.5, 34.5, 37.5], [36.5, 53.5, 33.5], [27.5, 53.5, 42.5], [23.5, 41.5, 64.5], [23.5, 37.5, 23.5], [31.75, 31.75, 65.75]]
@@ -302,7 +259,9 @@ if __name__ == '__main__':
 
         app.screen.fill((0, 0, 0))
         if app.gameover:
-            #time.sleep(200)
+            print app.score
+            pygame.image.save(sub, "slik" + str(num) + ".png")
+            time.sleep(400)
             app.center_msg("""Game Over!\nYour score: %dPress space to continue""" % app.score)
         else:
             if app.paused:
@@ -347,7 +306,7 @@ if __name__ == '__main__':
 
 
         if br==None:
-            app.gameover=True
+           app.gameover=True
 
         if br!=None:
 
@@ -365,10 +324,11 @@ if __name__ == '__main__':
                     maks_idx = i
 
             tetris.state = state.states[maks_idx]
+            tetris.check_for_cleared_lines()
             for j in tetris.state:
                print j
             print "+++++++++++"
-            tetris.check_for_cleared_lines()
+
 
             for r in range(state.actions[maks_idx][2]):
                 app.rotate_stone()
