@@ -14,8 +14,13 @@ import mss
 import numpy
 from nekimodul import TetrisApp, cell_size, cols, maxfps
 import pygame
-import random
-import collections
+from DQN import DQNAgent
+
+# Just disables the warning, doesn't enable AVX/FMA
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+EPISODES = 250
 
 class Tetris:
 
@@ -29,32 +34,8 @@ class Tetris:
                 self.state[i].append(0)
 
         self.cleared_lines = 0
-        self.bag = [1, 2, 3, 4, 5, 6, 7]
-        random.shuffle(self.bag)
-        self.sequence = collections.deque(self.bag)
 
         self.game_over = False
-
-    def stone_next(self):
-        num = self.sequence.popleft()
-        if not self.sequence:
-            bag = [1, 2, 3, 4, 5, 6, 7]
-            random.shuffle(bag)
-            self.sequence.extend(bag)
-        return num
-
-
-    def row_empty(self,num):
-
-        for i in range(10):
-            if self.state[num][i] == 1:
-                return False
-
-        return True
-
-    def end_game(self):
-        return not self.row_empty(0) or not self.row_empty(1)
-
 
     def generate_state_based_on_action_and_figure(self, dict, action, figure):
 
@@ -81,13 +62,21 @@ class Tetris:
         #pronalazenje najvise slobodne tacke na sirini figure
         for i in range(highest_available_x-1, highest_available_x-1+width):
             for j in range(20):
-                if self.state[j][i] == 1:
-                    if j <= highest_available_y:
-                        highest_available_y = j-1
-                    highest_available.append(j-1)
-                    break
-                if j == 19:
-                    highest_available.append(19)
+                try:
+                    if self.state[j][i] == 1:
+                        if j <= highest_available_y:
+                            highest_available_y = j-1
+                        highest_available.append(j-1)
+                        break
+                    if j == 19:
+                        highest_available.append(19)
+                except IndexError:
+                    for z in self.state:
+                        print z
+                    print label
+                    print action
+                    print i
+                    print j
 
         if (all(x==highest_available[0] for x in highest_available)):
             if (highest_available[0] == 19):
@@ -152,12 +141,7 @@ class Tetris:
 
         #ciscenje
         highest_available = []
-
-        self.check_for_cleared_lines()
-
-        '''for i in range(20):
-            print (self.state[i])
-        print'''
+        tetris.check_for_cleared_lines()
 
         return ret_val
 
@@ -180,16 +164,13 @@ class Tetris:
             return 4
 
     def check_for_cleared_lines(self):
-
-        ret_val=0
+        broj = 0
         for i in range(20):
             if all(x == 1 for x in self.state[i]):
                 self.state.pop(i)
                 self.state.insert(0, [0,0,0,0,0,0,0,0,0,0])
                 self.cleared_lines += 1
-                ret_val+=1
 
-        return ret_val
 
     def generate_states_for_action(self,dict,figure):
 
@@ -255,16 +236,18 @@ class Tetris:
 
 if __name__ == '__main__':
     tetris = Tetris()
+    genetic = None
 
     dict = {}
     for e in Figure:
         dict[e.name] = e.value
 
-    print dict
-
-    #tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [0, 1, 0], 3)
-
-    #tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [1, 1, 0], 1)
+    state_size = 200
+    action_size = 38
+    agent = DQNAgent(state_size, action_size)
+    # agent.load("./save/cartpole-dqn.h5")
+    done = False
+    episodes = 0
 
     app = TetrisApp()
     ###############################################################
@@ -288,10 +271,16 @@ if __name__ == '__main__':
     mon = {'top': 0, 'left': 0, 'width': 200, 'height': 200}
     sct = mss.mss()
     while 1:
-
         app.screen.fill((0, 0, 0))
         if app.gameover:
-            app.center_msg("""Game Over!\nYour score: %dPress space to continue""" % app.score)
+            if br == None:
+                episodes = 0
+                app.gameover = True
+                agent.replay(200)
+                app.start_game()
+                tetris = Tetris()
+                continue
+            #app.center_msg("""Game Over!\nYour score: %dPress space to continue""" % app.score)
         else:
             if app.paused:
                 app.center_msg("Paused")
@@ -328,7 +317,6 @@ if __name__ == '__main__':
         ######kod ide ovde
         rect = pygame.Rect(0, 0, 280, 56)
         sub = app.screen.subsurface(rect)
-        #pygame.image.save(sub, "slik" + str(num) + ".png")
         colors = pygame.transform.average_color(sub)
         br = tetris.detect_figure(colors)
 
@@ -336,42 +324,43 @@ if __name__ == '__main__':
         dont_burn_my_cpu.tick(maxfps)
 
         if br==None:
-           app.gameover=True
+            app.gameover = True
 
         if br!=None:
 
-            state = tetris.generate_states_for_action(dict,br)
+            if episodes == EPISODES:
+                app.gameover = True
+                br = None
+                continue
 
-            maks_heuristic = -10000
-            maks_idx=0
-            for i in range(len(state.states)):
+            action = agent.act(numpy.reshape(tetris.state, [1, state_size]), tetris,dict,br)
 
-                genetic = Genetic(state.states[i])
+            state = tetris.generate_state_based_on_action_and_figure(dict, action, br)
 
-                heuristic = genetic.heuristic()
-                if heuristic>maks_heuristic:
-                    maks_heuristic = heuristic
-                    maks_idx = i
+            reward1 = app.score
 
-            tetris.state = state.states[maks_idx]
-            tetris.check_for_cleared_lines()
+            for i in range(action[2]):
+                app.rotate_stone();
 
-
-
-
-            for r in range(state.actions[maks_idx][2]):
-                app.rotate_stone()
-
-            if (state.actions[maks_idx][1] == 0):
-                move = -1 * state.actions[maks_idx][0]
-                app.move(move)
-
-            if (state.actions[maks_idx][1] == 1):
-                move = state.actions[maks_idx][0]
-                app.move(move)
+            if action[1] == 0:
+                app.move(-1 * action[0])
+            elif action[1] == 1:
+                app.move(1 * action[0])
 
             app.insta_drop()
-            #time.sleep(0.5)
 
-        num += 1
-        dont_burn_my_cpu.tick(maxfps)
+            reward2 = app.score
+
+            reward = 0
+            if app.gameover == True:
+                reward = -10
+            else:
+                reward = reward2 - reward1
+
+
+            agent.remember(numpy.reshape(tetris.state, [1, state_size]), action, reward, numpy.reshape(state, [1, state_size]), app.gameover)
+
+            tetris.state = state
+
+
+            episodes += 1
