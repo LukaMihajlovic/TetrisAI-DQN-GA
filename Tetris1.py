@@ -14,6 +14,8 @@ import mss
 import numpy
 from nekimodul import TetrisApp, cell_size, cols, maxfps
 import pygame
+import random
+import collections
 
 class Tetris:
 
@@ -27,8 +29,32 @@ class Tetris:
                 self.state[i].append(0)
 
         self.cleared_lines = 0
+        self.bag = [1, 2, 3, 4, 5, 6, 7]
+        random.shuffle(self.bag)
+        self.sequence = collections.deque(self.bag)
 
         self.game_over = False
+
+    def stone_next(self):
+        num = self.sequence.popleft()
+        if not self.sequence:
+            bag = [1, 2, 3, 4, 5, 6, 7]
+            random.shuffle(bag)
+            self.sequence.extend(bag)
+        return num
+
+
+    def row_empty(self,num):
+
+        for i in range(10):
+            if self.state[num][i] == 1:
+                return False
+
+        return True
+
+    def end_game(self):
+        return not self.row_empty(0) or not self.row_empty(1)
+
 
     def generate_state_based_on_action_and_figure(self, dict, action, figure):
 
@@ -155,11 +181,15 @@ class Tetris:
 
     def check_for_cleared_lines(self):
 
+        ret_val=0
         for i in range(20):
             if all(x == 1 for x in self.state[i]):
                 self.state.pop(i)
                 self.state.insert(0, [0,0,0,0,0,0,0,0,0,0])
                 self.cleared_lines += 1
+                ret_val+=1
+
+        return ret_val
 
     def generate_states_for_action(self,dict,figure):
 
@@ -342,7 +372,7 @@ if __name__ == '__main__':
                 app.move(move)
 
             app.insta_drop()
-            time.sleep(0.5)
+            #time.sleep(0.5)
 
         num += 1
         dont_burn_my_cpu.tick(maxfps)

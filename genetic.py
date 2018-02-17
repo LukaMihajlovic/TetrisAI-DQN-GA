@@ -60,10 +60,18 @@ class Genetic:
 
         return ret_val
 
+    def training(self,a,b,c,d):
+        return -a * self.agg_height() + b * self.complete_lines() - c * self.holes() - d * self.bumpines()
+
     def heuristic(self):
-        a = -0.510066
+        '''a = -0.510066
         b = 0.760666
         c = -0.35663
+        d = -0.184483'''
+        a = -0.569163046288
+        b = 0.419453048216
+        c = -0.69469314556
+        #d = -0.132340472246
         d = -0.184483
 
         return a*self.agg_height() + b*self.complete_lines() + c*self.holes() + d*self.bumpines()
