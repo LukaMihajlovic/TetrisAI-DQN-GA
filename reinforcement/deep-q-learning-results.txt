@@ -15,3 +15,4 @@ Broj ociscenih linija za exploration rate veci od 0.3 je 41 u broju partija 154
 Broj ociscenih linija za exploration rate veci od 0.95 je 399 u broju partija 1
 Broj ociscenih linija za exploration rate veci od 0.9 je 0 u broju partija 1
 Broj ociscenih linija za exploration rate veci od 0.85 je 0 u broju partija 1
+Broj ociscenih linija za exploration rate veci od 0.25 je 33 u broju partija 182
