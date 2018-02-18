@@ -205,9 +205,3 @@ if __name__=="__main__":
         print("Average fitness = " + str(totalFitness / len(candidates)))
         print("Highest fitness = " + str(candidates[0].fitness) + "(" + str(count) + ")")
         print("Fittest candidate = " + str(candidates[0].heightWeight)+" | "+str(candidates[0].linesWeight)+" | "+ str(candidates[0].holesWeight)+" | "+str(candidates[0].bumpinessWeight)+"|" + "(" + str(count) + ")")
-
-
-
-
-
-

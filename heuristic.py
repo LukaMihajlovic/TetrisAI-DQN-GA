@@ -64,20 +64,10 @@ class Genetic:
         return -a * self.agg_height() + b * self.complete_lines() - c * self.holes() - d * self.bumpines()
 
     def heuristic(self):
-        '''a = -0.510066
-        b = 0.760666
-        c = -0.35663
-        d = -0.184483'''
         a = -0.569163046288
-        #b = 0.419453048216
         b = 0.508179903299
         c = -0.69469314556
-        #d = -0.132340472246
         d = -0.18448322467
-        '''a = -0.647201264458
-        b = 0.508179903299
-        c = -0.552110354968
-        d = -0.134379556122'''
 
         return a*self.agg_height() + b*self.complete_lines() + c*self.holes() + d*self.bumpines()
 

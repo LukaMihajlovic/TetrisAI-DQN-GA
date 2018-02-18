@@ -1,18 +1,9 @@
 from figures import Figure
 from heuristic import Genetic
-from state import State
 from tetris import Tetris
-import time
-import copy
-import os
-import ctypes
-import cv2
 import mss
-import numpy
 from gui import TetrisApp, cell_size, cols, maxfps
 import pygame
-import random
-import collections
 
 if __name__ == '__main__':
     tetris = Tetris()

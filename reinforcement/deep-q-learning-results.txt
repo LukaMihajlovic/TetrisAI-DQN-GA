@@ -1,0 +1,17 @@
+Broj ociscenih linija za exploration rate veci od 0.95 je 7549 u broju partija 52
+Broj ociscenih linija za exploration rate veci od 0.9 je 2015 u broju partija 54
+Broj ociscenih linija za exploration rate veci od 0.85 je 1051 u broju partija 57
+Broj ociscenih linija za exploration rate veci od 0.8 je 633 u broju partija 61
+Broj ociscenih linija za exploration rate veci od 0.75 je 386 u broju partija 64
+Broj ociscenih linija za exploration rate veci od 0.7 je 288 u broju partija 69
+Broj ociscenih linija za exploration rate veci od 0.65 je 229 u broju partija 74
+Broj ociscenih linija za exploration rate veci od 0.6 je 209 u broju partija 80
+Broj ociscenih linija za exploration rate veci od 0.55 je 119 u broju partija 87
+Broj ociscenih linija za exploration rate veci od 0.5 je 92 u broju partija 95
+Broj ociscenih linija za exploration rate veci od 0.45 je 84 u broju partija 106
+Broj ociscenih linija za exploration rate veci od 0.4 je 41 u broju partija 117
+Broj ociscenih linija za exploration rate veci od 0.35 je 43 u broju partija 134
+Broj ociscenih linija za exploration rate veci od 0.3 je 41 u broju partija 154
+Broj ociscenih linija za exploration rate veci od 0.95 je 399 u broju partija 1
+Broj ociscenih linija za exploration rate veci od 0.9 je 0 u broju partija 1
+Broj ociscenih linija za exploration rate veci od 0.85 je 0 u broju partija 1

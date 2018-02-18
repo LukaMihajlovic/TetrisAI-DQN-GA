@@ -1,17 +1,8 @@
 from figures import Figure
 from heuristic import Genetic
 from state import State
-import time
-#import pyautogui
 import copy
-#from selenium import webdriver
-import os
-#from selenium.webdriver.chrome.options import Options
-#import pyautogui
-import ctypes
-import cv2
 import mss
-import numpy
 from gui import TetrisApp, cell_size, cols, maxfps
 import pygame
 import random
@@ -367,7 +358,9 @@ if __name__ == '__main__':
                 app.move(move)
 
             app.insta_drop()
+
             #time.sleep(0.5)
 
         num += 1
         dont_burn_my_cpu.tick(maxfps)
+
