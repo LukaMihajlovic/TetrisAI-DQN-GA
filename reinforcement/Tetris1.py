@@ -1,5 +1,5 @@
 from Figures1 import Figure
-from genetic import Genetic
+from heuristic import Genetic
 from state import State
 import time
 #import pyautogui

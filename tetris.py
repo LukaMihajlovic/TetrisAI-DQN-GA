@@ -1,5 +1,5 @@
-from Figures1 import Figure
-from genetic import Genetic
+from figures import Figure
+from heuristic import Genetic
 from state import State
 import time
 #import pyautogui
@@ -12,7 +12,7 @@ import ctypes
 import cv2
 import mss
 import numpy
-from nekimodul import TetrisApp, cell_size, cols, maxfps
+from gui import TetrisApp, cell_size, cols, maxfps
 import pygame
 import random
 import collections
@@ -261,10 +261,6 @@ if __name__ == '__main__':
         dict[e.name] = e.value
 
     print dict
-
-    #tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [0, 1, 0], 3)
-
-    #tetris.state=tetris.generate_state_based_on_action_and_figure(dict, [1, 1, 0], 1)
 
     app = TetrisApp()
     ###############################################################

@@ -1,9 +1,11 @@
+import os.path
 class State:
 
 
     def __init__(self):
         self.states=[]
         self.actions=[]
+
 
 
 class Candidate:
@@ -21,3 +23,6 @@ class Candidate:
 
 if __name__=="__main__":
     s = Candidate(None,None,None,None,None)
+    file = open("gen4.txt", "a")
+
+    print naming_file(2)

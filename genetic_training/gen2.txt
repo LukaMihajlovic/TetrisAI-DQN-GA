@@ -1,0 +1,39 @@
+Average fitness = 66
+Highest fitness = 379(0)
+Fittest candidate = 0.908266403381 | 0.387909651697 | 0.0557790053073 | 0.146516023619|(0)
+
+Average fitness = 139
+Highest fitness = 381(1)
+Fittest candidate = 0.918058619684 | 0.315462775496 | 0.131330964315 | 0.20100693001|(1)
+
+Average fitness = 230
+Highest fitness = 389(2)
+Fittest candidate = 0.788699114204 | 0.558220127154 | 0.140850885337 | 0.21565023764|(2)
+
+Average fitness = 309
+Highest fitness = 389(3)
+Fittest candidate = 0.788699114204 | 0.558220127154 | 0.140850885337 | 0.21565023764|(3)
+
+Average fitness = 347
+Highest fitness = 389(4)
+Fittest candidate = 0.788699114204 | 0.558220127154 | 0.140850885337 | 0.21565023764|(4)
+
+Average fitness = 370
+Highest fitness = 389(5)
+Fittest candidate = 0.788699114204 | 0.558220127154 | 0.140850885337 | 0.21565023764|(5)
+
+Average fitness = 376
+Highest fitness = 390(6)
+Fittest candidate = 0.918199215542 | 0.230448340373 | 0.238301049007 | 0.216832592198|(6)
+
+Average fitness = 380
+Highest fitness = 390(7)
+Fittest candidate = 0.918199215542 | 0.230448340373 | 0.238301049007 | 0.216832592198|(7)
+
+Average fitness = 381
+Highest fitness = 390(8)
+Fittest candidate = 0.918199215542 | 0.230448340373 | 0.238301049007 | 0.216832592198|(8)
+
+Average fitness = 382
+Highest fitness = 390(9)
+Fittest candidate = 0.918199215542 | 0.230448340373 | 0.238301049007 | 0.216832592198|(9)

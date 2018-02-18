@@ -4,7 +4,7 @@ from collections import deque
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
-from genetic import Genetic
+from heuristic import Genetic
 
 actions = [
     [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0], [1,1,0], [2,1,0], [3,1,0], [4,1,0],
