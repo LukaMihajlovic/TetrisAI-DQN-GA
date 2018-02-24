@@ -21,11 +21,11 @@ class DQNAgent:
         self.state_size = state_size
         self.action_size = action_size
         self.memory = deque(maxlen=2000)
-        self.gamma = 0.95    # discount rate
+        self.gamma = 0.9    # discount rate
         self.epsilon = 1.0  # exploration rate
         self.epsilon_min = 0.01
-        self.epsilon_decay = 0.5
-        self.learning_rate = 0.01
+        self.epsilon_decay = 0.9995
+        self.learning_rate = 0.1
         self.tau = .125
         self.model = self._build_model()
         self.target_model = self._build_model()
@@ -39,7 +39,7 @@ class DQNAgent:
         # Neural Net for Deep-Q learning Model
         model = Sequential()
         model.add(Dense(128, input_dim=self.state_size, activation='relu'))
-        model.add(Dense(128, activation='relu'))
+        model.add(Dense(64, activation='relu'))
         model.add(Dense(self.action_size, activation='linear'))
         model.compile(loss="mean_squared_error",
             optimizer=Adam(lr=self.learning_rate))
@@ -115,4 +115,18 @@ class DQNAgent:
             self.model.fit(state, target_f, epochs=1, verbose=0)
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
+        if self.epsilon < 0.4:
+            self.save("mreza1-dqn.h5")
+        if self.epsilon < 0.3:
+            self.save("mreza2-dqn.h5")
+        if self.epsilon < 0.2:
+            self.save("mreza3-dqn.h5")
+        if self.epsilon < 0.1:
+            self.save("mreza4-dqn.h5")
         print self.epsilon
+
+    def load(self, name):
+        self.model.load_weights(name)
+
+    def save(self, name):
+        self.model.save_weights(name)

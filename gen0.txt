@@ -1,0 +1,40 @@
+Average cleared lines = 80
+Most cleared lines = 386(0)
+Best heuristic values = 0.369089332306 | 0.70157920444 | 0.590990916672 | 0.149296420206|(0)
+
+Average cleared lines = 171
+Most cleared lines = 387(0)
+Best heuristic values = 0.453930339239 | 0.7039632156 | 0.530224315144 | 0.131321033468|(0)
+
+Average cleared lines = 282
+Most cleared lines = 387(0)
+Best heuristic values = 0.453930339239 | 0.7039632156 | 0.530224315144 | 0.131321033468|(0)
+
+Average cleared lines = 361
+Most cleared lines = 393(0)
+Best heuristic values = 0.736998541225 | 0.206725263368 | 0.614165604604 | 0.192089629701|(0)
+
+Average cleared lines = 381
+Most cleared lines = 393(0)
+Best heuristic values = 0.736998541225 | 0.206725263368 | 0.614165604604 | 0.192089629701|(0)
+
+Average cleared lines = 384
+Most cleared lines = 393(0)
+Best heuristic values = 0.736998541225 | 0.206725263368 | 0.614165604604 | 0.192089629701|(0)
+
+Average cleared lines = 383
+Most cleared lines = 393(0)
+Best heuristic values = 0.736998541225 | 0.206725263368 | 0.614165604604 | 0.192089629701|(0)
+
+Average cleared lines = 385
+Most cleared lines = 393(0)
+Best heuristic values = 0.736998541225 | 0.206725263368 | 0.614165604604 | 0.192089629701|(0)
+
+Average cleared lines = 385
+Most cleared lines = 393(0)
+Best heuristic values = 0.736998541225 | 0.206725263368 | 0.614165604604 | 0.192089629701|(0)
+
+Average cleared lines = 385
+Most cleared lines = 393(0)
+Best heuristic values = 0.736998541225 | 0.206725263368 | 0.614165604604 | 0.192089629701|(0)
+

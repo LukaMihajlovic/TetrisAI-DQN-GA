@@ -227,7 +227,8 @@ if __name__ == '__main__':
     state_size = 200
     action_size = 38
     agent = DQNAgent(10, action_size)
-    # agent.load("./save/cartpole-dqn.h5")
+    agent.load("mreza4-dqn.h5")
+    agent.epsilon = 0.2
     done = False
     episodes = 0
 
@@ -241,8 +242,7 @@ if __name__ == '__main__':
         'DOWN': lambda: app.drop(True),
         'UP': app.rotate_stone,
         'p': app.toggle_pause,
-        'SPACE': app.start_game,
-        'RETURN': app.insta_drop
+        'RETURN': app.start_game,
     }
 
     app.gameover = False
@@ -263,7 +263,7 @@ if __name__ == '__main__':
                 broj_partija_file += 1
                 episodes = 0
                 app.gameover = True
-                agent.replay(500)
+                agent.replay(800)
                 agent.target_train()
                 app.start_game()
                 tetris = Tetris()
@@ -308,6 +308,7 @@ if __name__ == '__main__':
             elif event.type == pygame.KEYDOWN:
                 for key in key_actions:
                     if event.key == eval("pygame.K_" + key):
+                        print key
                         key_actions[key]()
 
         ######kod ide ovde

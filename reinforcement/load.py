@@ -1,12 +1,17 @@
 from figures import Figure
-from heuristic import Genetic
 from state import State
 import copy
 import mss
+import numpy
 from gui import TetrisApp, cell_size, cols, maxfps
 import pygame
-import random
-import collections
+from DQN import DQNAgent
+
+# Just disables the warning, doesn't enable AVX/FMA
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+EPISODES = 1000
 
 class Tetris:
 
@@ -20,32 +25,8 @@ class Tetris:
                 self.state[i].append(0)
 
         self.cleared_lines = 0
-        self.bag = [1, 2, 3, 4, 5, 6, 7]
-        random.shuffle(self.bag)
-        self.sequence = collections.deque(self.bag)
 
         self.game_over = False
-
-    def stone_next(self):
-        num = self.sequence.popleft()
-        if not self.sequence:
-            bag = [1, 2, 3, 4, 5, 6, 7]
-            random.shuffle(bag)
-            self.sequence.extend(bag)
-        return num
-
-
-    def row_empty(self,num):
-
-        for i in range(10):
-            if self.state[num][i] == 1:
-                return False
-
-        return True
-
-    def end_game(self):
-        return not self.row_empty(0) or not self.row_empty(1)
-
 
     def generate_state_based_on_action_and_figure(self, dict, action, figure):
 
@@ -143,9 +124,7 @@ class Tetris:
 
         #ciscenje
         highest_available = []
-
-        self.check_for_cleared_lines()
-
+        tetris.check_for_cleared_lines()
 
         return ret_val
 
@@ -168,16 +147,13 @@ class Tetris:
             return 4
 
     def check_for_cleared_lines(self):
-
-        ret_val=0
+        broj = 0
         for i in range(20):
             if all(x == 1 for x in self.state[i]):
                 self.state.pop(i)
                 self.state.insert(0, [0,0,0,0,0,0,0,0,0,0])
                 self.cleared_lines += 1
-                ret_val+=1
 
-        return ret_val
 
     def generate_states_for_action(self,dict,figure):
 
@@ -202,15 +178,6 @@ class Tetris:
                 action = [k, 1, i]
                 ret_val.states.append(self.generate_state_based_on_action_and_figure(dict, action, figure))
                 ret_val.actions.append(action)
-
-
-
-        '''for u in range(len(ret_val)):
-            for o in range(22):
-        for u in range(len(ret_val)):
-            for o in range(20):
-                print (ret_val[u][o])
-            print'''
 
         return ret_val
 
@@ -241,12 +208,29 @@ class Tetris:
             num = num + 1
 
 
+def check_for_cleared_lines_global(s):
+    broj = 0
+    for i in range(20):
+        if all(x == 1 for x in s[i]):
+            s.pop(i)
+            s.insert(0, [0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+    return s
+
 if __name__ == '__main__':
     tetris = Tetris()
+    genetic = None
 
     dict = {}
     for e in Figure:
         dict[e.name] = e.value
+
+    state_size = 200
+    action_size = 38
+    agent = DQNAgent(10, action_size)
+    agent.load("mreza-dqn.h5")
+    agent.epsilon = 0.12
+    done = False
+    episodes = 0
 
     app = TetrisApp()
     ###############################################################
@@ -258,8 +242,8 @@ if __name__ == '__main__':
         'DOWN': lambda: app.drop(True),
         'UP': app.rotate_stone,
         'p': app.toggle_pause,
-        'SPACE': app.start_game,
-        'RETURN': app.insta_drop
+        'RETURN': app.start_game,
+        'SPACE' : agent.save("mreza-dqn.h5")
     }
 
     app.gameover = False
@@ -269,11 +253,31 @@ if __name__ == '__main__':
     num=0;
     mon = {'top': 0, 'left': 0, 'width': 200, 'height': 200}
     sct = mss.mss()
+    write_to_file_step = 0.95
+    broj_ociscenih_linija_file = 0
+    broj_partija_file = 0
     while 1:
-
         app.screen.fill((0, 0, 0))
         if app.gameover:
-            app.center_msg("""Game Over!\nYour score: %dPress space to continue""" % app.score)
+            if br == None:
+                broj_ociscenih_linija_file += app.lines
+                broj_partija_file += 1
+                episodes = 0
+                app.gameover = True
+                agent.replay(800)
+                agent.target_train()
+                app.start_game()
+                tetris = Tetris()
+                # belezenje rezultata
+                if agent.epsilon < write_to_file_step:
+                    with open("deep-q-learning-results.txt", "a") as myfile:
+                        myfile.write("Broj ociscenih linija za exploration rate veci od " + str(
+                            write_to_file_step) + " je " + str(
+                            broj_ociscenih_linija_file) + " u broju partija " + str(broj_partija_file) + "\n")
+                        write_to_file_step = write_to_file_step - 0.05
+                        broj_ociscenih_linija_file = 0
+                        broj_partija_file = 0
+                continue
         else:
             if app.paused:
                 app.center_msg("Paused")
@@ -305,12 +309,12 @@ if __name__ == '__main__':
             elif event.type == pygame.KEYDOWN:
                 for key in key_actions:
                     if event.key == eval("pygame.K_" + key):
+                        print key
                         key_actions[key]()
 
         ######kod ide ovde
         rect = pygame.Rect(0, 0, 280, 56)
         sub = app.screen.subsurface(rect)
-        #pygame.image.save(sub, "slik" + str(num) + ".png")
         colors = pygame.transform.average_color(sub)
         br = tetris.detect_figure(colors)
 
@@ -318,39 +322,46 @@ if __name__ == '__main__':
         dont_burn_my_cpu.tick(maxfps)
 
         if br==None:
-           app.gameover=True
+            app.gameover = True
 
         if br!=None:
 
-            state = tetris.generate_states_for_action(dict,br)
+            if episodes == EPISODES:
+                app.gameover = True
+                br = None
+                continue
 
-            maks_heuristic = -10000
-            maks_idx=0
-            for i in range(len(state.states)):
+            action = agent.act(numpy.reshape(tetris.state, [20, 10]), tetris,dict,br)
 
-                genetic = Genetic(state.states[i])
+            state = tetris.generate_state_based_on_action_and_figure(dict, action, br)
 
-                heuristic = genetic.heuristic()
-                if heuristic>maks_heuristic:
-                    maks_heuristic = heuristic
-                    maks_idx = i
+            reward1 = app.score
 
-            tetris.state = state.states[maks_idx]
-            tetris.check_for_cleared_lines()
+            for i in range(action[2]):
+                app.rotate_stone();
 
-
-
-
-            for r in range(state.actions[maks_idx][2]):
-                app.rotate_stone()
-
-            if (state.actions[maks_idx][1] == 0):
-                move = -1 * state.actions[maks_idx][0]
-                app.move(move)
-
-            if (state.actions[maks_idx][1] == 1):
-                move = state.actions[maks_idx][0]
-                app.move(move)
+            if action[1] == 0:
+                app.move(-1 * action[0])
+            elif action[1] == 1:
+                app.move(1 * action[0])
 
             app.insta_drop()
 
+            reward2 = app.score
+
+            reward = 0
+            if app.gameover == True:
+                reward = -500
+            else:
+                reward = reward2 - reward1
+                if reward == 0:
+                    reward = -80
+
+            state = check_for_cleared_lines_global(state)
+
+            agent.remember(numpy.reshape(tetris.state, [20,10]), action, reward, numpy.reshape(state, [20, 10]), app.gameover)
+            #print numpy.reshape(tetris.state, [20, 10])
+
+            tetris.state = state
+
+            episodes += 1
